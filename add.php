@@ -85,14 +85,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 
 <script type="text/javascript">
 (function() {
-    var input_title = document.getElementById('title');
-    var ajax_container = document.getElementById('ajax-container');
-    var ENTER_KEY = 13;
+    var input_title = document.getElementById('title'),
+        ajax_container = document.getElementById('ajax-container'),
+        ENTER_KEY = 13
+        SPACE_BAR_KEY = 32;
 
     // Add keyup listener
     input_title.addEventListener('keyup', function(event) {
 
-        if (input_title.value.length < 3 ) {
+        if (input_title.value.length < 3 || event.which !== SPACE_BAR_KEY) {
             return false;
         }       
 
@@ -104,9 +105,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
                 ajax_container.style.display = 'block';
             }
         };
-        xhr.open('GET', 'movie.php?t=' + encodeURI(input_title.value), true);
-        xhr.send();
+        xhr.open('GET', 'movie.php?t=' + encodeURI(input_title.value.trim()), true);
+        xhr.send(null);
     });
+
+    // Hide input on blur
+    // document.getElementsByTagName('input').addEventListener('focus', function() {
+    //     if (this.name !== 'title') {
+    //          ajax_container.style.display = 'none';
+    //     }
+    // });
+    // input_title.addEventListener('blur', function(event) {
+        
+    //     ajax_container.style.display = 'none';
+    // });
 
     // select movie
     ajax_container.addEventListener('click', function(event) {
@@ -117,12 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
          document.querySelector('input[name=lang_code]').value = movie.dataset.lang;
          document.querySelector('input[name=poster]').value = movie.dataset.poster;
          this.style.display = 'none';
-    });
-
-    // Hide input on blur
-    input_title.addEventLister('blur', function(event) {
-        ajax_container.style.display = 'none';
-    });
+    });    
 })();
 
 </script>

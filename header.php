@@ -27,11 +27,17 @@
             .movie:last-child {
                 border-bottom: none;
             }
+
+            table .asc:after {
+                content: '▲';
+            }
+
+            table .desc:after {
+                content: '▼'
+            }
         </style>
     </head>
     <body>
         <div class="container">
             <h1>Movietheek</h1>
             <main class="content">
-                
-            
