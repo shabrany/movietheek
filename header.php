@@ -28,6 +28,10 @@
                 border-bottom: none;
             }
 
+            table thead {
+                cursor: pointer;
+            }
+
             table .asc:after {
                 content: '▲';
             }

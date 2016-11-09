@@ -7,7 +7,7 @@ $pdo = new PDO($dns, 'root', 'root');
 $order_by = (isset($_GET['order'])) ? $_GET['order'] : 'title';
 
 // get all movies
-$sql = 'SELECT * FROM movies ORDER BY ' . $order_by . ' LIMIT 10';
+$sql = 'SELECT * FROM movies ORDER BY ' . $order_by;
 $movies = $pdo->query($sql)->fetchAll();
 
 include 'header.php'; ?>
@@ -21,7 +21,7 @@ include 'header.php'; ?>
 <h3>My Collection (<?php echo count($movies); ?>)</h3>
 
 <?php if (count($movies)): ?>
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th data-sort-type="integer">ID</th>
@@ -33,8 +33,8 @@ include 'header.php'; ?>
             <?php foreach ($movies as $movie): ?>
                 <tr>
                     <td><?php echo $movie['id']; ?></td>
-                    <td><?php echo $movie['title']; ?></td>
-                    <td><?php echo $movie['authors']; ?></td>
+                    <td><?php echo trim($movie['title']); ?></td>
+                    <td><?php echo trim($movie['authors']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

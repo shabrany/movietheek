@@ -85,14 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 
 <script type="text/javascript">
 (function() {
+    'use strict';
+
     var input_title = document.getElementById('title'),
         ajax_container = document.getElementById('ajax-container'),
-        ENTER_KEY = 13
-        SPACE_BAR_KEY = 32;
+        ENTER_KEY = 13,
+        SPACE_BAR_KEY = 32,
+        ESCAPE_KEY = 27;
 
     // Add keyup listener
     input_title.addEventListener('keyup', function(event) {
-
         if (input_title.value.length < 3 || event.which !== SPACE_BAR_KEY) {
             return false;
         }       
@@ -109,16 +111,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
         xhr.send(null);
     });
 
-    // Hide input on blur
-    // document.getElementsByTagName('input').addEventListener('focus', function() {
-    //     if (this.name !== 'title') {
-    //          ajax_container.style.display = 'none';
-    //     }
-    // });
-    // input_title.addEventListener('blur', function(event) {
-        
-    //     ajax_container.style.display = 'none';
-    // });
+    document.addEventListener('keyup', function(event) {
+        console.log(event.which === ESCAPE_KEY);
+        if (event.which === ESCAPE_KEY) {
+            ajax_container.style.display = 'none';
+        }
+    });
 
     // select movie
     ajax_container.addEventListener('click', function(event) {

@@ -38,8 +38,18 @@
                     if (!settings.columnSorted) {
                         return false;
                     }
+                }
 
-
+                function sortAlphaNum(a,b) {
+                    var a_alpha = a.replace(/[^a-zA-Z]/g, "");
+                    var b_alpha = b.replace(/[^a-zA-Z]/g, "");
+                    if(a_alpha === b_alpha) {
+                        var a_numeric = parseInt(a.replace(/[^0-9]/g, ""), 10);
+                        var b_numeric = parseInt(b.replace(/[^0-9]/g, ""), 10);
+                        return (a_numeric === b_numeric) ? 0 : ((a_numeric > b_numeric) ? 1 : -1);
+                    } else {
+                        return (a_alpha > b_alpha) ? 1 : -1;
+                    }
                 }
 
                 return _parent.each(function(index, table) {
@@ -69,22 +79,16 @@
                         // Get to know the column index
                         columnIndex = (!settings.columnSortedIndex) ? event.target.cellIndex : settings.columnSortedIndex;
 
-                        console.log(columnIndex);
-
                         // get data from column index
                         columnData = collectColumnData(rows, columnIndex);
 
                         columnData.sort(function(a, b) {
-                            if (sortType == 'integer') {
-                                return (sortOrder == 'asc') ? a.value - b.value : b.value - a.value;
-                            }
-
-                            if (sortType == 'string') {
-                                return (sortOrder == 'asc') ? a.value > b.value : b.value > a.value;
-                            }
-
-                            console.log(a.value);
+                            return sortAlphaNum(a.value, b.value);
                         });
+
+                        if (sortOrder == 'desc') {
+                            columnData.reverse();
+                        }
 
                         // render table body with new sorted data
                         for (var i = 0; i < columnData.length; i++) {
@@ -94,6 +98,7 @@
                         $(table).find('tbody').html(rowsHTML);
                     });
 
+                    // Execute method after
                     setTimeout(function() {
                         if (settings.columnSortedIndex !== false) {
                             console.log('test');
@@ -103,8 +108,7 @@
                             settings.columnSortedIndex = false;
                             settings.columnOrder = null;
                         }
-                    }, 200);                    
-
+                    }, 0);
                 });
             };
 
@@ -118,7 +122,7 @@
             $(document).ready(function() {
                 $('.table').df3TableSort({
                     columnSortedIndex: 0,
-                    columnOrder: 'asc'
+                    columnOrder: 'desc'
                 });
             });
         })(jQuery);
