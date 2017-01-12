@@ -93,22 +93,41 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
         SPACE_BAR_KEY = 32,
         ESCAPE_KEY = 27;
 
+    function ajaxCall(options) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', options.url, true);
+        xhr.send(null);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                options.success(xhr.responseText);
+            }
+        };
+    } 
+
+    function selectMovie() {
+        var movies = document.querySelectorAll('.movie');
+        for (var i = 0; i < movies.length; i++) {
+            movies[i].addEventListener('click', function() {
+                console.log(this);
+            });
+        }
+    }
+
     // Add keyup listener
     input_title.addEventListener('keyup', function(event) {
         if (input_title.value.length < 3 || event.which !== SPACE_BAR_KEY) {
             return false;
         }       
 
-        // create ajax request
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                ajax_container.innerHTML = xhr.responseText;
+        ajaxCall({
+            url: 'search.php?s=' + encodeURI(input_title.value.trim()),
+            success: function(response) {
+                ajax_container.innerHTML = response;
                 ajax_container.style.display = 'block';
+                selectMovie();
             }
-        };
-        xhr.open('GET', 'movie.php?t=' + encodeURI(input_title.value.trim()), true);
-        xhr.send(null);
+        });
+
     });
 
     document.addEventListener('keyup', function(event) {
@@ -119,15 +138,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
     });
 
     // select movie
-    ajax_container.addEventListener('click', function(event) {
-         var movie = this.querySelector('.movie');
-         document.querySelector('input[name=title]').value = movie.dataset.title;
-         document.querySelector('input[name=year]').value = movie.dataset.year;
-         document.querySelector('input[name=authors]').value = movie.dataset.actors;
-         document.querySelector('input[name=lang_code]').value = movie.dataset.lang;
-         document.querySelector('input[name=poster]').value = movie.dataset.poster;
-         this.style.display = 'none';
-    });    
+    //var document.querySelectorAll('.movie');
+    
+    //.addEventListener('click', function(event) {
+
+      //  console.log(event);
+       // console.log(this);
+
+
+        //  var movie = this.querySelector('.movie');
+        //  document.querySelector('input[name=title]').value = movie.dataset.title;
+        //  document.querySelector('input[name=year]').value = movie.dataset.year;
+        //  document.querySelector('input[name=authors]').value = movie.dataset.actors;
+        //  document.querySelector('input[name=lang_code]').value = movie.dataset.lang;
+        //  document.querySelector('input[name=poster]').value = movie.dataset.poster;
+        //  this.style.display = 'none';
+    //});    
 })();
 
 </script>

@@ -10,6 +10,19 @@ $order_by = (isset($_GET['order'])) ? $_GET['order'] : 'title';
 $sql = 'SELECT * FROM movies ORDER BY ' . $order_by;
 $movies = $pdo->query($sql)->fetchAll();
 
+if (filter_input(INPUT_GET, 'output') == 'plain') {
+
+    $i = 1;
+    foreach ($movies as $movie) {
+        echo $i . "&nbsp;&nbsp;&nbsp;   " . trim($movie['title']); 
+        echo (!empty($movie['year'])) ? ' (' . $movie['year'] . ')' : '';       
+        echo "<br>"; 
+        $i++;
+    }
+
+    exit;
+}
+
 include 'header.php'; ?>
 
 <div class="row">

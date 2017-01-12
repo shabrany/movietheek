@@ -16,6 +16,9 @@
                 border: 1px solid #ccc;
                 min-width: 300px;
                 display: none;
+                max-height: 300px;
+                overflow-y: scroll;
+                box-shadow: 0px 2px 12px 0px rgba(0,0,0, .4);
             }
 
             .movie {
