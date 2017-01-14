@@ -1,28 +1,18 @@
 <?php 
 
 $host_api = 'http://www.omdbapi.com/?plot=full&r=json';
-$title = (isset($_REQUEST['t'])) ? $_REQUEST['t'] : '';
+$imdbID = (isset($_REQUEST['id'])) ? $_REQUEST['id'] : '';
 
-if (isset($_REQUEST['t'])) { 
+function printJSON($data, $json = false) {
+    header('Content-Type: application/json');
+    echo (($json) ? json_encode($data) : $data) ;
+}
 
-    $url = $host_api . '&t=' . urlencode($title);
+if (!empty($imdbID)) { 
+    $url = $host_api . '&i=' . urlencode($imdbID);
     $contents = file_get_contents($url);
-    $movie = json_decode($contents);
-
-    if (!isset($movie->Error)): ?>
-        <div class="movie" 
-             data-title="<?php echo $movie->Title; ?>"
-             data-year="<?php echo $movie->Year; ?>"
-             data-actors="<?php echo $movie->Actors; ?>"
-             data-lang="<?php echo $movie->Language; ?>"
-             data-poster="<?php echo $movie->Poster; ?>">  
-             <?php if ($movie->Poster != 'N/A'): ?>  
-            <img src="<?php echo $movie->Poster ?>" height="50">
-            <?php endif; ?>
-            <span><?php echo $movie->Title; ?> (<?php echo $movie->Year; ?>)</span><br>
-            <small><?php echo $movie->Actors; ?></small>
-        </div>    
-    <?php else: ?>
-        <p>Nothing found</p>
-    <?php endif; 
+    printJSON($contents);
+   
+} else {
+    printJSON(['message' => 'Bad request.'], true);
 }

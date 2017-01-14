@@ -10,13 +10,14 @@ $is_year_valid = (isset($_POST['year']) && !empty($_POST['year']));
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  {
 
-    $sql = 'INSERT INTO movies (title, subtitle, year, authors, languages, wishlist, poster) 
-                        VALUES (:title, :subtitle, :year, :authors, :languages, :wishlist, :poster)';
+    $sql = 'INSERT INTO movies (imdb_id, title, subtitle, year, authors, languages, wishlist, poster) 
+                        VALUES (:imdb_id, :title, :subtitle, :year, :authors, :languages, :wishlist, :poster)';
 
     $wishlist = (isset($_POST['wishlist'])) ? $_POST['wishlist'] : 0;
 
     try {
         $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':imdb_id', $_POST['imdb'], PDO::PARAM_STR);
         $stmt->bindParam(':title', $_POST['title'], PDO::PARAM_STR);
         $stmt->bindParam(':subtitle', $_POST['subtitle'], PDO::PARAM_STR);
         $stmt->bindParam(':year', $_POST['year'], PDO::PARAM_INT);
@@ -44,6 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 
 <form method="post" action="<?php $_SERVER['PHP_SELF']; ?>"> 
     <input type="hidden" name="poster" value="">
+    
+    <div class="form-group">
+        <label>IMDB ID</label>
+        <input type="text" name="imdb" id="imdb" class="form-control" value="<?php isset($_POST['imdb']) ? $_POST['imdb'] : ''; ?>">
+        <div id="ajax-container"></div> 
+    </div>
+
     <div class="form-group">
         <label>Title</label>
         <input type="text" name="title" id="title" class="form-control" value="<?php isset($_POST['title']) ? $_POST['title'] : ''; ?>">
@@ -88,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
     'use strict';
 
     var input_title = document.getElementById('title'),
-        ajax_container = document.getElementById('ajax-container'),
+        input_imdb = document.getElementById('imdb'),
+        ajaxContainer = document.getElementById('ajax-container'),
         ENTER_KEY = 13,
         SPACE_BAR_KEY = 32,
         ESCAPE_KEY = 27;
@@ -102,13 +111,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
                 options.success(xhr.responseText);
             }
         };
-    } 
+    }
 
-    function selectMovie() {
+    function selectMovie(element) {
+         var movieID = element.getAttribute('data-imdb');
+
+         ajaxCall({
+             url: 'movie.php?id=' + movieID,
+             success: function(response) {
+                 var movie = JSON.parse(response);
+                document.querySelector('input[name=imdb]').value = movie.imdbID;
+                document.querySelector('input[name=title]').value = movie.Title;
+                document.querySelector('input[name=year]').value = movie.Year;
+                document.querySelector('input[name=authors]').value = movie.Actors;
+                document.querySelector('input[name=lang_code]').value = movie.Language;
+                document.querySelector('input[name=poster]').value = movie.Poster;
+                ajaxContainer.style.display = 'none';
+             }
+         });
+    }
+
+    function initClickEvent() {
         var movies = document.querySelectorAll('.movie');
         for (var i = 0; i < movies.length; i++) {
             movies[i].addEventListener('click', function() {
-                console.log(this);
+                selectMovie(this);
             });
         }
     }
@@ -122,38 +149,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
         ajaxCall({
             url: 'search.php?s=' + encodeURI(input_title.value.trim()),
             success: function(response) {
-                ajax_container.innerHTML = response;
-                ajax_container.style.display = 'block';
-                selectMovie();
+                ajaxContainer.innerHTML = response;
+                ajaxContainer.style.display = 'block';
+                initClickEvent();
             }
         });
+    });
 
+    input_imdb.addEventListener('paste', function(event) {
+        console.log('lets check it out!');
     });
 
     document.addEventListener('keyup', function(event) {
-        console.log(event.which === ESCAPE_KEY);
+        //console.log(event.which === ESCAPE_KEY);
         if (event.which === ESCAPE_KEY) {
-            ajax_container.style.display = 'none';
+            ajaxContainer.style.display = 'none';
         }
     });
 
-    // select movie
-    //var document.querySelectorAll('.movie');
-    
-    //.addEventListener('click', function(event) {
-
-      //  console.log(event);
-       // console.log(this);
-
-
-        //  var movie = this.querySelector('.movie');
-        //  document.querySelector('input[name=title]').value = movie.dataset.title;
-        //  document.querySelector('input[name=year]').value = movie.dataset.year;
-        //  document.querySelector('input[name=authors]').value = movie.dataset.actors;
-        //  document.querySelector('input[name=lang_code]').value = movie.dataset.lang;
-        //  document.querySelector('input[name=poster]').value = movie.dataset.poster;
-        //  this.style.display = 'none';
-    //});    
 })();
 
 </script>

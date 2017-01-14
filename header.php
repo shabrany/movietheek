@@ -21,13 +21,15 @@
                 box-shadow: 0px 2px 12px 0px rgba(0,0,0, .4);
             }
 
-            .movie {
+            .movie, 
+            .item {
                 padding: 5px;
                 border-bottom: 1px solid #ccc;
                 cursor: pointer;
             }
 
-            .movie:last-child {
+            .movie:last-child, 
+            .item:last-child {
                 border-bottom: none;
             }
 
