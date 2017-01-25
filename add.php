@@ -46,16 +46,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 <form method="post" action="<?php $_SERVER['PHP_SELF']; ?>"> 
     <input type="hidden" name="poster" value="">
     
-    <div class="form-group">
-        <label>IMDB ID</label>
-        <input type="text" name="imdb" id="imdb" class="form-control" value="<?php isset($_POST['imdb']) ? $_POST['imdb'] : ''; ?>">
-        <div id="ajax-container"></div> 
-    </div>
-
-    <div class="form-group">
-        <label>Title</label>
-        <input type="text" name="title" id="title" class="form-control" value="<?php isset($_POST['title']) ? $_POST['title'] : ''; ?>">
-        <div id="ajax-container"></div>
+    <div class="row">
+        <div class="col-sm-6">
+			<div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" id="title" class="form-control" value="<?php isset($_POST['title']) ? $_POST['title'] : ''; ?>">                
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label>IMDB ID</label>
+                <input type="text" name="imdb" id="imdb" class="form-control" value="<?php isset($_POST['imdb']) ? $_POST['imdb'] : ''; ?>">                
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -97,10 +100,79 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 
     var input_title = document.getElementById('title'),
         input_imdb = document.getElementById('imdb'),
-        ajaxContainer = document.getElementById('ajax-container'),
         ENTER_KEY = 13,
         SPACE_BAR_KEY = 32,
         ESCAPE_KEY = 27;
+
+	function init() {
+		
+		// Add keyup listener
+		input_title.addEventListener('keyup', function(event) {
+
+			if (input_title.value == '') {
+				this.parentElement.removeChild(document.querySelector('.ajax-container'));
+			}
+
+			if (input_title.value.length < 3 || event.which !== SPACE_BAR_KEY || input_title.value.trim() == 'the') {
+				return false;
+			}
+
+			var parentDiv = this.parentElement;			
+		
+			//if ()
+			var ajaxContainer = createAjaxContainer();
+
+			ajaxCall({
+				url: 'search.php?s=' + encodeURI(input_title.value.trim()),
+				success: function(response) {
+					if (parentDiv.querySelector('.ajax-container') == null) {
+						ajaxContainer.innerHTML = response;
+						ajaxContainer.style.display = 'block';
+						parentDiv.appendChild(ajaxContainer);
+					} else {
+						parentDiv.querySelector('.ajax-container').innerHTML = response;
+					}
+
+					initClickEvent();
+				}
+			});
+		});
+
+		input_imdb.addEventListener('paste', function(event) {
+			console.log('lets check it out!');
+		});
+
+		document.addEventListener('keyup', function(event) {
+			if (event.which === ESCAPE_KEY) {
+				ajaxContainer.style.display = 'none';
+			}
+		});
+
+		// Attach click event to pagination
+		document.addEventListener('click', function(event) {
+			if (event.target.className == 'page-nav') {
+				navigate2page(event.target);
+			}
+		});
+	}
+
+	function navigate2page(a) {
+		var url = a.getAttribute('data-href');
+		var ajaxContainer = document.querySelector('.ajax-container');
+		
+		ajaxCall({
+			url: url,
+			success: function(response) {
+				ajaxContainer.innerHTML = response;
+			}
+		});
+	}
+
+	function createAjaxContainer() {
+		var container = document.createElement('div');
+		container.className = 'ajax-container';
+		return container;
+	}
 
     function ajaxCall(options) {
         var xhr = new XMLHttpRequest();
@@ -138,34 +210,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
                 selectMovie(this);
             });
         }
-    }
+    }    
 
-    // Add keyup listener
-    input_title.addEventListener('keyup', function(event) {
-        if (input_title.value.length < 3 || event.which !== SPACE_BAR_KEY) {
-            return false;
-        }       
-
-        ajaxCall({
-            url: 'search.php?s=' + encodeURI(input_title.value.trim()),
-            success: function(response) {
-                ajaxContainer.innerHTML = response;
-                ajaxContainer.style.display = 'block';
-                initClickEvent();
-            }
-        });
-    });
-
-    input_imdb.addEventListener('paste', function(event) {
-        console.log('lets check it out!');
-    });
-
-    document.addEventListener('keyup', function(event) {
-        //console.log(event.which === ESCAPE_KEY);
-        if (event.which === ESCAPE_KEY) {
-            ajaxContainer.style.display = 'none';
-        }
-    });
+	init();
 
 })();
 

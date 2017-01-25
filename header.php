@@ -10,15 +10,26 @@
                 padding: 15px;
             }
 
-            #ajax-container {
+            .ajax-container {
                 position: absolute;
                 background: #fff;
                 border: 1px solid #ccc;
                 min-width: 300px;
                 display: none;
                 max-height: 300px;
-                overflow-y: scroll;
+                overflow-y: auto;
                 box-shadow: 0px 2px 12px 0px rgba(0,0,0, .4);
+                z-index: 10;
+                padding: 15px;
+            }
+
+            .ajax-container .result-info {
+                padding: 0px 5px 10px;
+                border-bottom: 1px solid #ccc;
+            }
+
+            .ajax-container .result-info ul {
+                margin-bottom: 0px;
             }
 
             .movie, 
@@ -43,6 +54,10 @@
 
             table .desc:after {
                 content: '▼'
+            }
+
+            .pager a {
+                cursor: pointer;
             }
         </style>
     </head>
