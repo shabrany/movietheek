@@ -1,32 +1,17 @@
-
 <?php
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-$dns = 'mysql:host=localhost;dbname=movietheek';
-$pdo = new PDO($dns, 'root', 'root');
+include  __DIR__ . '/lib/start.php';
 
 // sort by
-$order_by = (isset($_GET['order'])) ? $_GET['order'] : 'title';
+$orderBy = filter_input(INPUT_GET, FILTER_SANITIZE_STRING);
 
 // get all movies
-$sql = 'SELECT * FROM movies ORDER BY ' . $order_by;
-$movies = $pdo->query($sql)->fetchAll();
+$movies = get_all_movies($orderBy);
 
-if (filter_input(INPUT_GET, 'output') == 'plain') {
-
-    $i = 1;
-    foreach ($movies as $movie) {
-        echo $i . "&nbsp;&nbsp;&nbsp;   " . trim($movie['title']); 
-        echo (!empty($movie['year'])) ? ' (' . $movie['year'] . ')' : '';       
-        echo "<br>"; 
-        $i++;
-    }
-
-    exit;
-}
-
-include 'header.php'; ?>
+include 'header.php';
+?>
 
 <div class="row">
     <div class="col-sm-12 text-right">
@@ -42,7 +27,7 @@ include 'header.php'; ?>
             <tr>
                 <th data-sort-type="integer">ID</th>
                 <th>Title</th>
-                <th>Authors</th>
+                <th colspan="2">Authors</th>
             </tr>
         </thead>
         <tbody>
@@ -51,6 +36,9 @@ include 'header.php'; ?>
                     <td><?php echo $movie['id']; ?></td>
                     <td><?php echo trim($movie['title']); ?></td>
                     <td><?php echo trim($movie['authors']); ?></td>
+                    <td class="text-right">
+                        <a href="edit.php?id=<?php echo $movie['id'] ?>" class="btn btn-warning btn-xs">edit</a>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
