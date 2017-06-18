@@ -1,46 +1,23 @@
 <?php
 
-$dns = 'mysql:host=localhost;dbname=movietheek';
-$pdo = new PDO($dns, 'root', 'root');
+require __DIR__ . '/lib/start.php';
 
 include 'header.php';
 
-$is_title_valid = (isset($_POST['title']) && !empty($_POST['title']));
-$is_year_valid = (isset($_POST['year']) && !empty($_POST['year']));
+$message = '';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  {
-
-	$sql = 'INSERT INTO movies (imdb_id, title, subtitle, year, authors, languages, wishlist, poster)
-						VALUES (:imdb_id, :title, :subtitle, :year, :authors, :languages, :wishlist, :poster)';
-
-	$wishlist = (isset($_POST['wishlist'])) ? $_POST['wishlist'] : 0;
-
-	try {
-		$stmt = $pdo->prepare($sql);
-		$stmt->bindParam(':imdb_id', $_POST['imdb'], PDO::PARAM_STR);
-		$stmt->bindParam(':title', $_POST['title'], PDO::PARAM_STR);
-		$stmt->bindParam(':subtitle', $_POST['subtitle'], PDO::PARAM_STR);
-		$stmt->bindParam(':year', $_POST['year'], PDO::PARAM_INT);
-		$stmt->bindParam(':authors', $_POST['authors'], PDO::PARAM_STR);
-		$stmt->bindParam(':languages', $_POST['lang_code'], PDO::PARAM_STR);
-		$stmt->bindParam(':wishlist', $wishlist, PDO::PARAM_INT);
-		$stmt->bindParam(':poster', $_POST['poster'], PDO::PARAM_STR);
-		$stmt->execute();
-
-		echo '<p class="bg-success padding">Item added: ' . $_POST['title'] . '</p>';
-		$_POST = null;
-
-	} catch (PDOException $e) {
-		echo '<p class="bg-danger padding">
-			Regelnummer: '.$e->getLine().'<br />
-			Bestand: '.$e->getFile().'<br />
-			Foutmelding: '.$e->getMessage().'
-		</p>';
-	}
+if (insert_movie_on_post()) {
+	$message = 'Movie inserted: ' . $_POST['title'];
+	$_POST = null;
 }
+
 ?>
 
 <h3>Insert new item</h3>
+
+<?php if (!empty($message)): ?>
+	<div class="alert alert-success"><?php echo $message; ?></div>
+<?php endif ?>
 
 <form method="post" action="<?php $_SERVER['PHP_SELF']; ?>">
 	<input type="hidden" name="poster" value="">
@@ -55,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 		<div class="col-sm-6">
 			<div class="form-group">
 				<label>IMDB ID</label>
-				<input type="text" name="imdb" id="imdb" class="form-control" value="<?php isset($_POST['imdb']) ? $_POST['imdb'] : ''; ?>">
+				<input type="text" name="imdb" id="imdb_id" class="form-control" value="<?php isset($_POST['imdb_id']) ? $_POST['imdb_id'] : ''; ?>">
 			</div>
 		</div>
 	</div>
@@ -77,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $is_title_valid && $is_year_valid)  
 
 	<div class="form-group">
 		<label>Language code</label>
-		<input type="text" name="lang_code" class="form-control" value="<?php isset($_POST['lang_code']) ? $_POST['lang_code'] : ''; ?>">
+		<input type="text" name="languages" class="form-control" value="<?php isset($_POST['languages']) ? $_POST['languages'] : ''; ?>">
 	</div>
 
 	 <div class="form-group">
