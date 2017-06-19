@@ -1,37 +1,37 @@
 <?php
-$host_api = 'http://www.omdbapi.com/?plot=full&r=json';
+$config = require __DIR__ . '/config.php';
+$api_url = 'https://api.themoviedb.org/3/search/movie';
+$api_image_url = 'https://image.tmdb.org/t/p/w500';
 $title = filter_input(INPUT_GET, 's', FILTER_SANITIZE_ENCODED);
 $page = filter_input(INPUT_GET, 'p', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]);
 $movies = [];
-$query_string = '';
 
 if ($title) {
-	$query_string = '&s=' . $title . '&page=' . $page;
-	$url = $host_api . $query_string;
-    $contents = file_get_contents($url);
+	$url = $api_url . '?'. http_build_query(['api_key' => $config['api_key'], 'query' => $title, 'page' => $page]);
+	$contents = file_get_contents($url);
     $movies = json_decode($contents);
 }
 ?>
 
-<?php if ($movies->Response == 'True'): ?>
+<?php if ($movies && $movies->total_results > 0): ?>
 
-	<?php $totalPages = round($movies->totalResults / 10); ?>
+	<?php $totalPages = $movies->total_pages; ?>
 
 	<div class="result-info">
 		<ul class="list-inline">
-			<li>Found: <span class="badge"><?php echo $movies->totalResults; ?></span></li>
+			<li>Found: <span class="badge"><?php echo $movies->total_results; ?></span></li>
 			<li>Page <?php echo $page; ?> of <?php echo $totalPages; ?></li>
 		</ul>
 	</div>
 
-	<?php foreach ($movies->Search as $movie): ?>
+	<?php foreach ($movies->results as $movie): ?>
 		<div class="movie"
-			data-title="<?php echo $movie->Title; ?>"
-			data-imdb="<?php echo $movie->imdbID; ?>">
-			<?php if ($movie->Poster != 'N/A'): ?>
-				<img src="<?php echo $movie->Poster ?>" height="80">
+			data-title="<?php echo $movie->title; ?>"
+			data-imdb="<?php echo $movie->id; ?>">
+			<?php if ($movie->poster_path): ?>
+				<img src="<?php echo $api_image_url . $movie->poster_path ?>" height="80">
 			<?php endif; ?>
-			<span><?php echo $movie->Title; ?> (<?php echo $movie->Year; ?>)</span>
+			<span><?php echo $movie->title; ?> (<?php echo substr($movie->release_date, 0, 4); ?>)</span>
 		</div>
 	<?php endforeach; ?>
 
@@ -49,7 +49,6 @@ if ($title) {
 
 <?php else: ?>
 	<div class="item">
-		<span><?php echo $movies->Error; ?></span>
+		<span>Nothing found</span>
 	</div>
 <?php endif; ?>
-

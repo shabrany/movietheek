@@ -4,7 +4,7 @@ require __DIR__ . '/lib/start.php';
 
 include 'header.php';
 
-update_movie();
+update_movie_on_post();
 
 // Get movie
 $movie_id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
