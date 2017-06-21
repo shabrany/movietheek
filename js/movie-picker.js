@@ -48,21 +48,20 @@
 				success: function (res) {
 					var movie = JSON.parse(res);
 					console.log(movie);
-					if (movie.Response == 'True') {
+					if (movie.id) {
 						document.querySelector('input[name=imdb]').value = movie.imdbID;
 						document.querySelector('input[name=title]').value = movie.Title;
 						document.querySelector('input[name=year]').value = movie.Year;
-						document.querySelector('input[name=authors]').value = movie.Actors;
-						document.querySelector('input[name=lang_code]').value = movie.Language;
-						document.querySelector('input[name=poster]').value = movie.Poster;
+						//document.querySelector('input[name=authors]').value = movie.Actors
+						//doc87hTDiay2N2qWyX4Ds7ybXi9h8I.jpgument.querySelector('input[name=lang_code]').value = movie.Language;
+						document.querySelector('input[name=poster]').value = movie.poster_path;
 
-						if (movie.Poster != 'N/A') {
+						if (!empty(movie.poster_path)) {
 							var img = new Image();
-							img.src = movie.Poster;
+							img.src = movie.poster_path;
 							console.log(img);
 							document.querySelector('.image-wrapper').appendChild(img);
 						}
-
 					}
 				}
 			});
@@ -113,12 +112,12 @@
 			url: 'movie.php?id=' + movieID,
 			success: function (response) {
 				var movie = JSON.parse(response);
-				document.querySelector('input[name=imdb]').value = movie.imdbID;
-				document.querySelector('input[name=title]').value = movie.Title;
-				document.querySelector('input[name=year]').value = movie.Year;
-				document.querySelector('input[name=authors]').value = movie.Actors;
-				document.querySelector('input[name=lang_code]').value = movie.Language;
-				document.querySelector('input[name=poster]').value = movie.Poster;
+				document.querySelector('input[name=imdb]').value = movie.imdb_id;
+				document.querySelector('input[name=title]').value = movie.title;
+				document.querySelector('input[name=year]').value = movie.release_date.substr(0,4);
+				//document.querySelector('input[name=authors]').value = movie.Actors;
+				//document.querySelector('input[name=lang_code]').value = movie.Language;
+				document.querySelector('input[name=poster]').value = movie.poster_path;
 
 				// close popup results
 				formGroup.removeChild(document.querySelector('.ajax-container'));
