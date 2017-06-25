@@ -13,12 +13,15 @@ $movies = get_all_movies($orderBy);
 include 'header.php';
 ?>
 
+<?php if ($config['admin']): ?>
 <div class="row">
     <div class="col-sm-12 text-right">
         <a href="add.php" class="btn btn-primary">new item</a>
     </div>
 </div>
 <br>
+<?php endif; ?>
+
 <h3>My Collection (<?php echo count($movies); ?>)</h3>
 
 <?php if (count($movies)): ?>
@@ -37,7 +40,9 @@ include 'header.php';
                     <td><?php echo trim($movie['title']); ?></td>
                     <td><?php echo trim($movie['authors']); ?></td>
                     <td class="text-right">
-                        <a href="edit.php?id=<?php echo $movie['id'] ?>" class="btn btn-warning btn-xs">edit</a>
+                        <?php if ($config['admin']): ?>
+                            <a href="edit.php?id=<?php echo $movie['id'] ?>" class="btn btn-warning btn-xs">edit</a>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

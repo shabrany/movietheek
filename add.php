@@ -2,6 +2,10 @@
 
 require __DIR__ . '/lib/start.php';
 
+if (!$config['admin']) {
+	header('Location: index.php');
+}
+
 include 'header.php';
 
 $message = '';

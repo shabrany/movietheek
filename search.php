@@ -1,5 +1,10 @@
 <?php
 $config = require __DIR__ . '/config.php';
+
+if (!$config['admin']) {
+	die('No access for you my friend');
+}
+
 $api_url = 'https://api.themoviedb.org/3/search/movie';
 $api_image_url = 'https://image.tmdb.org/t/p/w500';
 $title = filter_input(INPUT_GET, 's', FILTER_SANITIZE_ENCODED);
